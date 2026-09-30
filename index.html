@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediControl Pro - Gestión Médica & Pacientes</title>
-  <!-- Tailwind CSS -->
+  <title>MediControl Pro - Sistema de Gestión Médica & Facturación</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -16,7 +16,7 @@
             medical: {
               50: '#f0f7ff',
               100: '#e0effe',
-              500: '#0066cc', // Azul clásico médico
+              500: '#0066cc',
               600: '#0052a5',
               700: '#003d7e',
               800: '#002954'
@@ -27,6 +27,7 @@
     }
   </script>
   <style>
+    /* Estilos personalizados para scroll y print */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
@@ -36,117 +37,192 @@
     }
   </style>
 </head>
-<body class="h-full flex flex-col font-sans bg-slate-50 text-slate-800 antialiased selection:bg-medical-500 selection:text-white">
+<body class="h-full font-sans bg-slate-100 text-slate-800 antialiased flex flex-col md:flex-row overflow-hidden">
 
-  <!-- TOP BAR / HEADER CLINICO -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 shadow-sm flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-medical-600 to-blue-400 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-medical-500/20">
-        <i class="fa-solid fa-user-doctor"></i>
+  <!-- SIDEBAR (VISIBLE EN TABLET Y ESCRITORIO) -->
+  <aside class="hidden md:flex md:w-64 lg:w-72 bg-slate-900 text-white flex-col justify-between shrink-0 border-r border-slate-800 z-20">
+    <div class="p-5 space-y-6">
+      <!-- Logo App -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-medical-500 to-blue-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-medical-500/30">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg tracking-tight text-white flex items-center gap-1.5">
+            MediControl <span class="text-[10px] bg-medical-500/30 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-medical-400/30">PRO</span>
+          </h1>
+          <p class="text-xs text-slate-400">Sistema Médico Integral</p>
+        </div>
       </div>
-      <div>
-        <h1 class="font-bold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
-          MediControl <span class="text-[10px] bg-medical-100 text-medical-700 font-bold px-2 py-0.5 rounded-full border border-medical-500/20">v2.4</span>
-        </h1>
-        <p class="text-xs text-slate-500 flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Dra. Arismendi (Cardiología)
-        </p>
-      </div>
+
+      <!-- Menú de Navegación -->
+      <nav class="space-y-1.5 text-sm font-medium">
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-medical-600 text-white font-semibold shadow-md shadow-medical-600/30">
+          <i class="fa-solid fa-users w-5 text-center"></i>
+          <span>Pacientes & Expedientes</span>
+        </a>
+        <a href="#" onclick="alert('Módulo de Facturación Global vinculando pagos y honorarios.')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-emerald-400"></i>
+          <span>Facturación & Pagos</span>
+        </a>
+        <a href="#" onclick="alert('Agenda médica sincronizada en tiempo real.')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-calendar-days w-5 text-center text-blue-400"></i>
+          <span>Agenda Citas</span>
+        </a>
+        <a href="#" onclick="alert('Sincronización con Google Drive y Google Sheets en la nube.')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-cloud-arrow-up w-5 text-center text-purple-400"></i>
+          <span>Base de Datos Sync</span>
+        </a>
+      </nav>
     </div>
-    
-    <div class="flex items-center space-x-2">
-      <button onclick="alert('Conexión con base de datos segura de Google Sheets activa.')" class="p-2 text-slate-500 hover:text-medical-600 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold transition flex items-center gap-1">
-        <i class="fa-solid fa-shield-halved text-medical-500"></i> Sync OK
+
+    <!-- Perfil del Médico en Sidebar -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold text-xs">
+          DA
+        </div>
+        <div>
+          <p class="text-xs font-bold text-slate-200">Dra. Arismendi</p>
+          <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online / Cardióloga
+          </p>
+        </div>
+      </div>
+      <button onclick="alert('Sesión protegida con credenciales Google Workspace.')" class="text-slate-500 hover:text-slate-300 text-xs">
+        <i class="fa-solid fa-right-from-bracket"></i>
       </button>
     </div>
-  </header>
+  </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-1 overflow-y-auto p-4 space-y-5 max-w-md mx-auto w-full pb-24">
+  <!-- ÁREA CONTENEDORA PRINCIPAL -->
+  <div class="flex-1 flex flex-col h-full overflow-hidden">
     
-    <!-- DASHBOARD DE KPIs MÉDICOS -->
-    <section class="grid grid-cols-2 gap-3">
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
-        <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Pacientes Totales</div>
-        <div class="text-2xl font-black text-slate-900 mt-1" id="statTotal">42</div>
-        <div class="text-[11px] text-emerald-600 mt-0.5 font-medium"><i class="fa-solid fa-arrow-up mr-0.5"></i> +6 este mes</div>
-        <i class="fa-solid fa-hospital-user absolute -right-2 -bottom-2 text-4xl text-slate-100"></i>
-      </div>
-
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
-        <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Citas Hoy</div>
-        <div class="text-2xl font-black text-medical-600 mt-1">3</div>
-        <div class="text-[11px] text-medical-600 mt-0.5 font-medium">Próxima: 10:30 AM</div>
-        <i class="fa-solid fa-calendar-day absolute -right-2 -bottom-2 text-4xl text-slate-100"></i>
-      </div>
-    </section>
-
-    <!-- BANNER DE ACCIÓN RÁPIDA / ENVIAR RECORDATORIOS EN LOTE -->
-    <section class="bg-gradient-to-r from-medical-600 to-blue-600 rounded-2xl p-4 text-white shadow-lg shadow-medical-500/20">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="font-bold text-sm">Notificaciones Automáticas</h3>
-          <p class="text-xs text-blue-100 mt-0.5">Envía recordatorios de cita por Email & WhatsApp</p>
+    <!-- HEADER SUPERIOR (ADAPTATIVO) -->
+    <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3.5 flex items-center justify-between shrink-0 shadow-sm z-10">
+      <!-- Título de sección y móvil logo -->
+      <div class="flex items-center space-x-3">
+        <div class="md:hidden w-9 h-9 rounded-xl bg-medical-600 flex items-center justify-center text-white font-bold text-lg">
+          <i class="fa-solid fa-user-doctor"></i>
         </div>
-        <button onclick="alert('Simulación: Se enviarían 3 recordatorios por WhatsApp y Email a las citas programadas para hoy.')" class="bg-white text-medical-700 hover:bg-blue-50 font-bold text-xs px-3.5 py-2 rounded-xl shadow transition active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-paper-plane text-medical-500"></i> Notificar Citas
+        <div>
+          <h2 class="font-bold text-base md:text-xl text-slate-900">Gestión de Pacientes</h2>
+          <p class="text-xs text-slate-500 hidden sm:block">Monitoreo de expedientes, emisión de constancias y facturación de consultas</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción Global -->
+      <div class="flex items-center space-x-2 md:space-x-3">
+        <button onclick="openPatientModal()" class="bg-medical-600 hover:bg-medical-700 text-white font-bold text-xs md:text-sm px-3.5 md:px-4 py-2 rounded-xl shadow-md shadow-medical-600/20 transition flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Nuevo Paciente</span>
+        </button>
+        <button onclick="alert('Sincronizando registros con Google Sheets...')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate text-medical-600"></i>
+          <span class="hidden md:inline">Sync DB</span>
         </button>
       </div>
-    </section>
+    </header>
 
-    <!-- FILTROS Y BÚSQUEDA AVANZADA -->
-    <section class="space-y-2.5">
-      <!-- Buscador -->
-      <div class="relative w-full">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-        <input type="text" id="searchInput" onkeyup="filterPatients()" placeholder="Buscar por nombre, teléfono o diagnóstico..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-medical-500 text-slate-800 placeholder-slate-400 shadow-sm">
-      </div>
+    <!-- ÁREA DE CONTENIDO SCROLLABLE -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto pb-24 md:pb-8">
+      
+      <!-- TARJETAS KPIS / RESUMEN GENERAL -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Pacientes</span>
+            <div class="text-2xl md:text-3xl font-black text-slate-900 mt-1" id="statTotal">42</div>
+          </div>
+          <div class="text-[11px] text-emerald-600 font-semibold mt-2 flex items-center gap-1">
+            <i class="fa-solid fa-arrow-trend-up"></i> +6 este mes
+          </div>
+          <i class="fa-solid fa-hospital-user absolute -right-3 -bottom-3 text-5xl text-slate-100"></i>
+        </div>
 
-      <!-- Filtros desplegables por características clínicas -->
-      <div class="grid grid-cols-2 gap-2">
-        <select id="allergyFilter" onchange="filterPatients()" class="bg-white border border-slate-200 text-slate-600 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-medical-500 shadow-sm">
-          <option value="ALL">Todas las Alergias</option>
-          <option value="Penicilina">Alergia a Penicilina</option>
-          <option value="AINEs">Alergia a AINEs / Ibuprofeno</option>
-          <option value="Sin Alergias">Sin Alergias Registradas</option>
-        </select>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Citas Hoy</span>
+            <div class="text-2xl md:text-3xl font-black text-medical-600 mt-1">3</div>
+          </div>
+          <div class="text-[11px] text-medical-600 font-medium mt-2">Próxima: 10:30 AM</div>
+          <i class="fa-solid fa-calendar-check absolute -right-3 -bottom-3 text-5xl text-slate-100"></i>
+        </div>
 
-        <select id="appointmentFilter" onchange="filterPatients()" class="bg-white border border-slate-200 text-slate-600 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-medical-500 shadow-sm">
-          <option value="ALL">Todas las Citas</option>
-          <option value="HOY">Cita Con Programada Hoy</option>
-          <option value="PENDIENTE">Con Cita Futura</option>
-        </select>
-      </div>
-    </section>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Facturado Mes</span>
+            <div class="text-2xl md:text-3xl font-black text-emerald-600 mt-1">$1,850</div>
+          </div>
+          <div class="text-[11px] text-slate-500 font-medium mt-2">12 Facturas PDF enviadas</div>
+          <i class="fa-solid fa-file-invoice-dollar absolute -right-3 -bottom-3 text-5xl text-slate-100"></i>
+        </div>
 
-    <!-- LISTADO DE PACIENTES REGISTRADOS -->
-    <section class="space-y-3" id="patientsList">
-      <!-- Se renderiza dinámicamente -->
-    </section>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col justify-between col-span-2 md:col-span-1">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Alertas Clínicas</span>
+            <div class="text-2xl md:text-3xl font-black text-red-500 mt-1">5</div>
+          </div>
+          <div class="text-[11px] text-red-600 font-semibold mt-2">Pacientes con Alergia Penicilina</div>
+          <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-5xl text-slate-100"></i>
+        </div>
+      </section>
 
-  </main>
+      <!-- BARRA DE BÚSQUEDA Y FILTROS AVANZADOS -->
+      <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 md:space-y-0 md:flex md:items-center md:justify-between md:gap-4">
+        <!-- Input Buscador -->
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="searchInput" onkeyup="filterPatients()" placeholder="Buscar por nombre, teléfono o diagnóstico..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-medical-500 text-slate-800 placeholder-slate-400">
+        </div>
 
-  <!-- BARRA DE NAVEGACIÓN INFERIOR PWA (ESTILO APP MÓVIL) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-30 flex justify-around items-center max-w-md mx-auto shadow-lg">
+        <!-- Desplegables de Filtro -->
+        <div class="flex items-center gap-2">
+          <select id="allergyFilter" onchange="filterPatients()" class="w-full md:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-medical-500 font-medium">
+            <option value="ALL">Todas las Alergias</option>
+            <option value="Penicilina">Alergia a Penicilina</option>
+            <option value="AINEs">Alergia a AINEs / Ibuprofeno</option>
+            <option value="Sin Alergias">Sin Alergias Registradas</option>
+          </select>
+
+          <select id="appointmentFilter" onchange="filterPatients()" class="w-full md:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-medical-500 font-medium">
+            <option value="ALL">Todas las Citas</option>
+            <option value="HOY">Cita Con Programada Hoy</option>
+            <option value="PENDIENTE">Con Cita Futura</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- LISTADO GRID DE PACIENTES (RESPONSIVE: 1 col móvil, 2 col tablet, 3 col desktop) -->
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="patientsList">
+        <!-- Renderizado dinámico vía JavaScript -->
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- NAVEGACIÓN BOTTOM (SOLO VISIBLE EN MÓVILES) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-30 flex justify-around items-center shadow-lg">
     <button class="flex flex-col items-center gap-1 text-medical-600 font-bold text-[11px]">
       <i class="fa-solid fa-users text-lg"></i>
       <span>Pacientes</span>
     </button>
     <button onclick="openPatientModal()" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 text-[11px] transition">
-      <div class="w-10 h-10 -mt-6 bg-medical-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-medical-500/40 border-2 border-white">
+      <div class="w-10 h-10 -mt-6 bg-medical-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-medical-600/40 border-2 border-white">
         <i class="fa-solid fa-plus text-base"></i>
       </div>
       <span class="mt-1">Nuevo</span>
     </button>
-    <button onclick="alert('Agenda médica vinculada con Google Calendar.')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 text-[11px] transition">
+    <button onclick="alert('Sincronizando agenda con Google Calendar.')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 text-[11px] transition">
       <i class="fa-solid fa-calendar-days text-lg"></i>
       <span>Agenda</span>
     </button>
   </nav>
 
-  <!-- MODAL: DETALLE / REGISTRO DE PACIENTE -->
+  <!-- MODAL: REGISTRO / EDICIÓN DE EXPEDIENTE -->
   <div id="patientModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl p-5 overflow-y-auto max-h-[90vh]">
+    <div class="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2" id="modalTitle">
           <i class="fa-solid fa-file-medical text-medical-500"></i> Expediente del Paciente
@@ -154,123 +230,165 @@
         <button onclick="closePatientModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <form id="patientForm" onsubmit="savePatient(event)" class="space-y-3 mt-3 text-xs">
+      <form id="patientForm" onsubmit="savePatient(event)" class="space-y-3.5 mt-4 text-xs">
         <input type="hidden" id="patientId">
         
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Nombre y Apellido</label>
-          <input type="text" id="pName" required placeholder="Ej: Dr. Roberto Gómez" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+          <label class="block font-semibold text-slate-700 mb-1">Nombre Completo del Paciente</label>
+          <input type="text" id="pName" required placeholder="Ej: Roberto Gómez" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold text-slate-600 mb-1">Teléfono</label>
-            <input type="tel" id="pPhone" required placeholder="+1 305 555 0192" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+            <label class="block font-semibold text-slate-700 mb-1">Teléfono Móvil (WhatsApp)</label>
+            <input type="tel" id="pPhone" required placeholder="+1 305 555 0192" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
           </div>
           <div>
-            <label class="block font-semibold text-slate-600 mb-1">Edad (Años)</label>
-            <input type="number" id="pAge" placeholder="48" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Dirección de Habitación</label>
-          <input type="text" id="pAddress" placeholder="Miami, FL" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Primera Consulta</label>
-            <input type="date" id="pFirstConsult" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Última Consulta</label>
-            <input type="date" id="pLastConsult" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+            <label class="block font-semibold text-slate-700 mb-1">Edad (Años)</label>
+            <input type="number" id="pAge" placeholder="48" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Próxima Cita Programada</label>
-          <input type="date" id="pNextApp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+          <label class="block font-semibold text-slate-700 mb-1">Dirección / Residencia</label>
+          <input type="text" id="pAddress" placeholder="Miami, FL" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Primera Consulta</label>
+            <input type="date" id="pFirstConsult" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Próxima Cita Programada</label>
+            <input type="date" id="pNextApp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
+          </div>
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Diagnóstico / Condición</label>
-          <input type="text" id="pDiagnosis" placeholder="Ej: Hipertensión Arterial Leve" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+          <label class="block font-semibold text-slate-700 mb-1">Diagnóstico Clínico</label>
+          <input type="text" id="pDiagnosis" placeholder="Ej: Hipertensión Arterial Leve" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Medicamentos que Toma Activamente</label>
-          <input type="text" id="pMeds" placeholder="Ej: Losartán 50mg (1 c/24h)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-medical-500">
+          <label class="block font-semibold text-slate-700 mb-1">Tratamiento Prescrito / Fármacos</label>
+          <input type="text" id="pMeds" placeholder="Ej: Losartán 50mg (1 c/24h)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-medical-500">
         </div>
 
         <div>
-          <label class="block font-semibold text-amber-700 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Medicamentos Alérgico (¡Importante!)</label>
-          <input type="text" id="pAllergies" placeholder="Ej: Penicilina, Sulfa" class="w-full bg-red-50/50 border border-red-200 text-red-900 rounded-xl px-3 py-2 font-semibold focus:outline-none focus:border-red-500">
+          <label class="block font-semibold text-amber-700 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Alergias Conocidas</label>
+          <input type="text" id="pAllergies" placeholder="Ej: Penicilina, AINEs, Ninguna" class="w-full bg-red-50/50 border border-red-200 text-red-900 rounded-xl px-3.5 py-2.5 font-semibold focus:outline-none focus:border-red-500">
         </div>
 
-        <div class="pt-3 flex justify-end gap-2">
-          <button type="button" onclick="closePatientModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl">Cancelar</button>
-          <button type="submit" class="px-5 py-2 bg-medical-600 hover:bg-medical-700 text-white font-semibold rounded-xl shadow-md shadow-medical-500/20">Guardar Expediente</button>
+        <div class="pt-4 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closePatientModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-medical-600 hover:bg-medical-700 text-white font-semibold rounded-xl shadow-md shadow-medical-600/20">Guardar Registro</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: GENERADOR DE CONSTANCIA MÉDICA / DOCUMENTO PDF -->
+  <!-- MODAL: GENERADOR DE PDF (SELECCIÓN: FACTURA O CONSTANCIA) -->
   <div id="pdfModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[92vh]">
       <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-file-pdf text-red-500"></i> Emitir Documento Médico PDF
-        </h3>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-file-pdf text-red-500 text-xl"></i>
+          <h3 class="text-base font-bold text-slate-900">Emisión de Documento PDF</h3>
+        </div>
         <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <!-- VISTA PREVIA DEL DOCUMENTO IMPRESO -->
-      <div id="pdfPrintArea" class="p-6 bg-white border border-slate-200 rounded-xl my-4 space-y-4 shadow-inner text-slate-800">
-        <div class="flex justify-between items-start border-b border-slate-200 pb-3">
+      <!-- Selector de Tipo de Documento -->
+      <div class="mt-4 flex bg-slate-100 p-1 rounded-xl gap-1 text-xs font-bold">
+        <button id="btnTabInvoice" onclick="switchPdfTab('invoice')" class="flex-1 py-2 rounded-lg bg-white text-medical-700 shadow-sm transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Factura Médica
+        </button>
+        <button id="btnTabConstancia" onclick="switchPdfTab('constancia')" class="flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-notes-medical"></i> Constancia / Récipe
+        </button>
+      </div>
+
+      <!-- VISTA PREVIA IMPRESA (ÁREA PDF) -->
+      <div id="pdfPrintArea" class="p-6 bg-white border border-slate-200 rounded-xl my-4 space-y-4 shadow-inner text-slate-800 text-xs">
+        
+        <!-- MEMBRETE DEL CONSULTORIO -->
+        <div class="flex justify-between items-start border-b border-slate-200 pb-4">
           <div>
-            <h2 class="text-lg font-black text-medical-700 tracking-tight">CENTRO MÉDICO ESPECIALIZADO</h2>
-            <p class="text-xs text-slate-600 font-bold">Dra. Arismendi — Especialista en Cardiología</p>
+            <h2 class="text-base font-black text-medical-700 tracking-tight">CENTRO MÉDICO ESPECIALIZADO</h2>
+            <p class="text-xs text-slate-700 font-bold">Dra. Arismendi — Cardiología & Salud Integral</p>
             <p class="text-[11px] text-slate-500">Lic. Médica #MP-94821 • Miami, FL</p>
           </div>
           <div class="text-right">
-            <span class="text-[10px] font-bold bg-medical-100 text-medical-800 px-2 py-0.5 rounded border border-medical-200">DOC #MED-2026-88</span>
+            <span id="pdfDocBadge" class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">FACTURA #FAC-2026-104</span>
             <p class="text-[11px] text-slate-500 mt-1">Fecha: <span id="pdfDate">2026-09-29</span></p>
           </div>
         </div>
 
-        <div class="text-center py-1">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 inline-block px-4 pb-0.5">Constancia Médica de Evaluación</h3>
+        <!-- DATOS DEL PACIENTE -->
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
+          <p><strong>Paciente:</strong> <span id="pdfPatientName" class="text-slate-900 font-bold">Sonia Fernández</span> (Edad: <span id="pdfPatientAge">52</span> años)</p>
+          <p><strong>Dirección:</strong> <span id="pdfPatientAddress">Coral Gables, FL</span> | <strong>Tel:</strong> <span id="pdfPatientPhone">+13058829102</span></p>
         </div>
 
-        <div class="text-xs leading-relaxed space-y-2">
-          <p>Por medio de la presente se hace constar que el/la paciente <strong id="pdfPatientName" class="text-slate-900">Sonia Fernández</strong>, de <span id="pdfPatientAge">52</span> años de edad, fue evaluado(a) clínicamente en la fecha correspondiente.</p>
-          
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
-            <p><strong>Diagnóstico Clínico:</strong> <span id="pdfDiagnosis">Hipertensión e Insuficiencia Leve</span></p>
-            <p><strong>Indicaciones / Tratamiento:</strong> <span id="pdfMeds">Enalapril 10mg, Aspirina 100mg</span></p>
-            <p><strong>Observación de Alergias:</strong> <span id="pdfAllergies" class="text-red-600 font-semibold">Penicilina</span></p>
+        <!-- CONTENIDO FACTURA (SE MUESTRA POR DEFECTO) -->
+        <div id="pdfInvoiceContent" class="space-y-3">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-300 text-slate-500 text-[10px] uppercase font-bold">
+                <th class="py-1.5">Descripción del Servicio</th>
+                <th class="py-1.5 text-center">Cant.</th>
+                <th class="py-1.5 text-right">Monto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-2 font-medium">Consulta Especializada de Cardiología</td>
+                <td class="py-2 text-center">1</td>
+                <td class="py-2 text-right">$120.00</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-medium">Electrocardiograma de Control</td>
+                <td class="py-2 text-center">1</td>
+                <td class="py-2 text-right">$50.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="border-t border-slate-200 pt-2 text-right space-y-1">
+            <p class="text-slate-500">Subtotal: <strong class="text-slate-800">$170.00</strong></p>
+            <p class="text-slate-500">Impuestos / I.V.A.: <strong class="text-slate-800">$0.00</strong></p>
+            <p class="text-sm font-black text-slate-900">Total a Pagar: <span class="text-emerald-600">$170.00</span></p>
           </div>
-
-          <p class="pt-1">Se expide la presente constancia a petición de la parte interesada para los fines médicos y administrativos que considere convenientes.</p>
         </div>
 
-        <div class="pt-8 flex justify-between items-end">
-          <div class="text-[10px] text-slate-400 italic">
-            Documento digital generado vía Google Apps Script & Google Docs API.
+        <!-- CONTENIDO CONSTANCIA (OCULTO INICIALMENTE) -->
+        <div id="pdfConstanciaContent" class="space-y-2 hidden">
+          <p class="leading-relaxed">Por medio de la presente se hace constar que el/la paciente ha sido evaluado(a) clínicamente en las instalaciones de este centro médico.</p>
+          <div class="bg-blue-50/50 p-2.5 rounded border border-blue-100 space-y-1">
+            <p><strong>Diagnóstico:</strong> <span id="pdfDiagnosis">Hipertensión e Insuficiencia Leve</span></p>
+            <p><strong>Tratamiento:</strong> <span id="pdfMeds">Enalapril 10mg, Aspirina 100mg</span></p>
+            <p><strong>Alergias Registradas:</strong> <span id="pdfAllergies" class="text-red-600 font-bold">Penicilina</span></p>
+          </div>
+        </div>
+
+        <!-- PIE DE PÁGINA DOCUMENTO -->
+        <div class="pt-6 flex justify-between items-end border-t border-slate-100">
+          <div class="text-[9px] text-slate-400">
+            Documento emitido electrónicamente.<br>MediControl Cloud Apps System.
           </div>
           <div class="text-center">
-            <div class="w-32 border-b border-slate-400 mb-1"></div>
+            <div class="w-28 border-b border-slate-400 mb-1"></div>
             <p class="text-[10px] font-bold text-slate-700">Dra. Arismendi</p>
-            <p class="text-[9px] text-slate-400">Firma / Sello Médico Digital</p>
+            <p class="text-[9px] text-slate-400">Firma / Sello Médico</p>
           </div>
         </div>
+
       </div>
 
-      <div class="flex justify-between items-center pt-2">
-        <button onclick="alert('Simulación: La constancia médica fue enviada en formato PDF al correo del paciente mediante el backend de Google Apps Script.')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5">
+      <!-- BOTONES DE ACCIÓN PARA EL DEMO -->
+      <div class="flex justify-between items-center pt-2 gap-2">
+        <button onclick="alert('Simulación exitosa: La factura médica en PDF ha sido enviada al correo del paciente mediante el servicio automatizado de Google Workspace / Apps Script.')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
           <i class="fa-solid fa-paper-plane"></i> Enviar PDF por Email
         </button>
         <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5">
@@ -280,7 +398,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- LÓGICA DE JAVASCRIPT -->
   <script>
     // BASE DE DATOS MOCK DE PACIENTES
     let patients = [
@@ -291,7 +409,6 @@
         age: 52,
         address: 'Coral Gables, FL',
         firstConsult: '2024-02-10',
-        lastConsult: '2026-08-15',
         nextApp: '2026-09-30',
         diagnosis: 'Hipertensión e Insuficiencia Leve',
         meds: 'Enalapril 10mg, Aspirina 100mg',
@@ -304,7 +421,6 @@
         age: 39,
         address: 'Doral, FL',
         firstConsult: '2025-01-20',
-        lastConsult: '2026-07-02',
         nextApp: '2026-10-12',
         diagnosis: 'Arritmia Sinusal Benigna',
         meds: 'Atenolol 25mg',
@@ -317,7 +433,6 @@
         age: 64,
         address: 'Kendall, FL',
         firstConsult: '2023-11-05',
-        lastConsult: '2026-09-01',
         nextApp: '2026-10-05',
         diagnosis: 'Control Post-Operatorio',
         meds: 'Omeprazol 20mg',
@@ -325,62 +440,66 @@
       }
     ];
 
+    let currentPatientForPdf = null;
+
     function renderPatients(data = patients) {
       const container = document.getElementById('patientsList');
       container.innerHTML = '';
 
       if (data.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No se encontraron pacientes registrados.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-xs">No se encontraron expedientes coincidentes.</div>`;
         return;
       }
 
       data.forEach(p => {
         const hasAllergies = p.allergies && p.allergies !== 'Sin Alergias' && p.allergies !== 'Ninguna';
         const allergyBadge = hasAllergies 
-          ? `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Alergia: ${p.allergies}</span>`
+          ? `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${p.allergies}</span>`
           : `<span class="bg-slate-100 text-slate-500 text-[10px] font-medium px-2 py-0.5 rounded-full">Sin Alergias</span>`;
 
         const card = document.createElement('div');
-        card.className = 'bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5 transition hover:border-medical-500/50';
+        card.className = 'bg-white border border-slate-200/80 rounded-2xl p-4 md:p-5 shadow-sm space-y-3 transition hover:border-medical-500/50 flex flex-col justify-between';
         card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-medical-50 text-medical-600 flex items-center justify-center font-bold text-sm border border-medical-100">
-                ${p.name.split(' ').map(n=>n[0]).join('')}
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-medical-50 text-medical-600 flex items-center justify-center font-bold text-sm border border-medical-100 shrink-0">
+                  ${p.name.split(' ').map(n=>n[0]).join('')}
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-slate-900">${p.name}</h4>
+                  <p class="text-[11px] text-slate-400">${p.age} años • ${p.address}</p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-bold text-sm text-slate-900">${p.name} <span class="text-xs text-slate-400 font-normal">(${p.age} años)</span></h4>
-                <p class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>${p.address}</p>
+              <div>${allergyBadge}</div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl text-xs space-y-1.5 border border-slate-100">
+              <div class="flex justify-between">
+                <span class="text-slate-400 font-medium">Diagnóstico:</span>
+                <span class="font-semibold text-slate-800">${p.diagnosis}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400 font-medium">Tratamiento:</span>
+                <span class="text-slate-700 truncate max-w-[140px]">${p.meds}</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-200/60">
+                <span class="text-slate-400 font-medium">Próxima Cita:</span>
+                <span class="font-bold text-medical-600"><i class="fa-solid fa-calendar-check mr-1"></i>${p.nextApp || 'No agendada'}</span>
               </div>
             </div>
-            <div>${allergyBadge}</div>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl text-xs space-y-1 border border-slate-100">
-            <div class="flex justify-between">
-              <span class="text-slate-500 font-medium">Diagnóstico:</span>
-              <span class="font-semibold text-slate-800">${p.diagnosis}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500 font-medium">Tratamiento:</span>
-              <span class="text-slate-700">${p.meds}</span>
-            </div>
-            <div class="flex justify-between pt-1 border-t border-slate-200/60">
-              <span class="text-slate-500 font-medium">Próxima Cita:</span>
-              <span class="font-bold text-medical-600"><i class="fa-solid fa-calendar-check mr-1"></i>${p.nextApp || 'No programada'}</span>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between pt-1 text-xs gap-2">
-            <button onclick="openPdfModal('${p.id}')" class="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-semibold rounded-xl text-center border border-red-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-file-pdf text-red-600"></i> Generar Constancia
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs gap-2">
+            <button onclick="openPdfModal('${p.id}')" class="flex-1 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-center border border-emerald-200 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-600"></i> Generar PDF
             </button>
 
-            <button onclick="alert('Enviando recordatorio por WhatsApp al ${p.phone}...')" class="p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl border border-emerald-200" title="WhatsApp">
-              <i class="fa-brands fa-whatsapp text-sm"></i>
+            <button onclick="alert('Recordatorio de cita enviado por WhatsApp al ${p.phone}')" class="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
             </button>
 
-            <button onclick="editPatient('${p.id}')" class="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl" title="Editar expediente">
+            <button onclick="editPatient('${p.id}')" class="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl" title="Editar">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
           </div>
@@ -425,16 +544,46 @@
 
     function openPdfModal(id) {
       const p = patients.find(x => x.id === id) || patients[0];
+      currentPatientForPdf = p;
+
       document.getElementById('pdfPatientName').innerText = p.name;
       document.getElementById('pdfPatientAge').innerText = p.age;
+      document.getElementById('pdfPatientAddress').innerText = p.address;
+      document.getElementById('pdfPatientPhone').innerText = p.phone;
       document.getElementById('pdfDiagnosis').innerText = p.diagnosis;
       document.getElementById('pdfMeds').innerText = p.meds;
       document.getElementById('pdfAllergies').innerText = p.allergies;
+
+      switchPdfTab('invoice');
       document.getElementById('pdfModal').classList.remove('hidden');
     }
 
     function closePdfModal() {
       document.getElementById('pdfModal').classList.add('hidden');
+    }
+
+    function switchPdfTab(type) {
+      const btnInv = document.getElementById('btnTabInvoice');
+      const btnConst = document.getElementById('btnTabConstancia');
+      const invContent = document.getElementById('pdfInvoiceContent');
+      const constContent = document.getElementById('pdfConstanciaContent');
+      const badge = document.getElementById('pdfDocBadge');
+
+      if (type === 'invoice') {
+        btnInv.className = "flex-1 py-2 rounded-lg bg-white text-medical-700 shadow-sm transition flex items-center justify-center gap-1.5 font-bold";
+        btnConst.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5 font-medium";
+        invContent.classList.remove('hidden');
+        constContent.classList.add('hidden');
+        badge.className = "text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200";
+        badge.innerText = "FACTURA #FAC-2026-104";
+      } else {
+        btnConst.className = "flex-1 py-2 rounded-lg bg-white text-medical-700 shadow-sm transition flex items-center justify-center gap-1.5 font-bold";
+        btnInv.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5 font-medium";
+        constContent.classList.remove('hidden');
+        invContent.classList.add('hidden');
+        badge.className = "text-[10px] font-bold bg-medical-100 text-medical-800 px-2 py-0.5 rounded border border-medical-200";
+        badge.innerText = "CONSTANCIA #MED-2026-88";
+      }
     }
 
     function savePatient(e) {
@@ -447,7 +596,6 @@
         age: document.getElementById('pAge').value || 30,
         address: document.getElementById('pAddress').value || 'Sin Dirección',
         firstConsult: document.getElementById('pFirstConsult').value || '2026-09-29',
-        lastConsult: document.getElementById('pLastConsult').value || '2026-09-29',
         nextApp: document.getElementById('pNextApp').value || '',
         diagnosis: document.getElementById('pDiagnosis').value || 'En Evaluación',
         meds: document.getElementById('pMeds').value || 'Ninguno',
@@ -472,7 +620,6 @@
       document.getElementById('pAge').value = p.age;
       document.getElementById('pAddress').value = p.address;
       document.getElementById('pFirstConsult').value = p.firstConsult;
-      document.getElementById('pLastConsult').value = p.lastConsult;
       document.getElementById('pNextApp').value = p.nextApp;
       document.getElementById('pDiagnosis').value = p.diagnosis;
       document.getElementById('pMeds').value = p.meds;
@@ -482,7 +629,7 @@
       document.getElementById('patientModal').classList.remove('hidden');
     }
 
-    // INIT
+    // Inicializar renderizado
     renderPatients();
   </script>
 </body>
