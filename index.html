@@ -29,6 +29,11 @@
   <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @media print {
+      body * { visibility: hidden; }
+      #pdfPrintArea, #pdfPrintArea * { visibility: visible; }
+      #pdfPrintArea { position: absolute; left: 0; top: 0; width: 100%; border: none !important; }
+    }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans bg-slate-50 text-slate-800 antialiased selection:bg-medical-500 selection:text-white">
@@ -212,6 +217,69 @@
     </div>
   </div>
 
+  <!-- MODAL: GENERADOR DE CONSTANCIA MÉDICA / DOCUMENTO PDF -->
+  <div id="pdfModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-file-pdf text-red-500"></i> Emitir Documento Médico PDF
+        </h3>
+        <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- VISTA PREVIA DEL DOCUMENTO IMPRESO -->
+      <div id="pdfPrintArea" class="p-6 bg-white border border-slate-200 rounded-xl my-4 space-y-4 shadow-inner text-slate-800">
+        <div class="flex justify-between items-start border-b border-slate-200 pb-3">
+          <div>
+            <h2 class="text-lg font-black text-medical-700 tracking-tight">CENTRO MÉDICO ESPECIALIZADO</h2>
+            <p class="text-xs text-slate-600 font-bold">Dra. Arismendi — Especialista en Cardiología</p>
+            <p class="text-[11px] text-slate-500">Lic. Médica #MP-94821 • Miami, FL</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] font-bold bg-medical-100 text-medical-800 px-2 py-0.5 rounded border border-medical-200">DOC #MED-2026-88</span>
+            <p class="text-[11px] text-slate-500 mt-1">Fecha: <span id="pdfDate">2026-09-29</span></p>
+          </div>
+        </div>
+
+        <div class="text-center py-1">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 inline-block px-4 pb-0.5">Constancia Médica de Evaluación</h3>
+        </div>
+
+        <div class="text-xs leading-relaxed space-y-2">
+          <p>Por medio de la presente se hace constar que el/la paciente <strong id="pdfPatientName" class="text-slate-900">Sonia Fernández</strong>, de <span id="pdfPatientAge">52</span> años de edad, fue evaluado(a) clínicamente en la fecha correspondiente.</p>
+          
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
+            <p><strong>Diagnóstico Clínico:</strong> <span id="pdfDiagnosis">Hipertensión e Insuficiencia Leve</span></p>
+            <p><strong>Indicaciones / Tratamiento:</strong> <span id="pdfMeds">Enalapril 10mg, Aspirina 100mg</span></p>
+            <p><strong>Observación de Alergias:</strong> <span id="pdfAllergies" class="text-red-600 font-semibold">Penicilina</span></p>
+          </div>
+
+          <p class="pt-1">Se expide la presente constancia a petición de la parte interesada para los fines médicos y administrativos que considere convenientes.</p>
+        </div>
+
+        <div class="pt-8 flex justify-between items-end">
+          <div class="text-[10px] text-slate-400 italic">
+            Documento digital generado vía Google Apps Script & Google Docs API.
+          </div>
+          <div class="text-center">
+            <div class="w-32 border-b border-slate-400 mb-1"></div>
+            <p class="text-[10px] font-bold text-slate-700">Dra. Arismendi</p>
+            <p class="text-[9px] text-slate-400">Firma / Sello Médico Digital</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <button onclick="alert('Simulación: La constancia médica fue enviada en formato PDF al correo del paciente mediante el backend de Google Apps Script.')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5">
+          <i class="fa-solid fa-paper-plane"></i> Enviar PDF por Email
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i> Imprimir / Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT LOGIC -->
   <script>
     // BASE DE DATOS MOCK DE PACIENTES
@@ -224,7 +292,7 @@
         address: 'Coral Gables, FL',
         firstConsult: '2024-02-10',
         lastConsult: '2026-08-15',
-        nextApp: '2026-09-30', // Hoy
+        nextApp: '2026-09-30',
         diagnosis: 'Hipertensión e Insuficiencia Leve',
         meds: 'Enalapril 10mg, Aspirina 100mg',
         allergies: 'Penicilina'
@@ -267,7 +335,6 @@
       }
 
       data.forEach(p => {
-        // Tag de alergia en rojo
         const hasAllergies = p.allergies && p.allergies !== 'Sin Alergias' && p.allergies !== 'Ninguna';
         const allergyBadge = hasAllergies 
           ? `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Alergia: ${p.allergies}</span>`
@@ -289,7 +356,6 @@
             <div>${allergyBadge}</div>
           </div>
 
-          <!-- Diagnóstico y Citas -->
           <div class="bg-slate-50 p-2.5 rounded-xl text-xs space-y-1 border border-slate-100">
             <div class="flex justify-between">
               <span class="text-slate-500 font-medium">Diagnóstico:</span>
@@ -305,14 +371,13 @@
             </div>
           </div>
 
-          <!-- Botones de Acción Médica y Notificaciones -->
           <div class="flex items-center justify-between pt-1 text-xs gap-2">
-            <button onclick="alert('Enviando recordatorio automático de cita por WhatsApp al teléfono ${p.phone}...')" class="flex-1 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl text-center border border-emerald-200 transition flex items-center justify-center gap-1">
-              <i class="fa-brands fa-whatsapp text-emerald-600"></i> Recordatorio WA
+            <button onclick="openPdfModal('${p.id}')" class="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-semibold rounded-xl text-center border border-red-200 transition flex items-center justify-center gap-1">
+              <i class="fa-solid fa-file-pdf text-red-600"></i> Generar Constancia
             </button>
 
-            <button onclick="alert('Enviando recordatorio de cita por Email al paciente...')" class="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-medical-700 font-semibold rounded-xl text-center border border-blue-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-envelope text-medical-500"></i> Email Cita
+            <button onclick="alert('Enviando recordatorio por WhatsApp al ${p.phone}...')" class="p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl border border-emerald-200" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp text-sm"></i>
             </button>
 
             <button onclick="editPatient('${p.id}')" class="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl" title="Editar expediente">
@@ -356,6 +421,20 @@
 
     function closePatientModal() {
       document.getElementById('patientModal').classList.add('hidden');
+    }
+
+    function openPdfModal(id) {
+      const p = patients.find(x => x.id === id) || patients[0];
+      document.getElementById('pdfPatientName').innerText = p.name;
+      document.getElementById('pdfPatientAge').innerText = p.age;
+      document.getElementById('pdfDiagnosis').innerText = p.diagnosis;
+      document.getElementById('pdfMeds').innerText = p.meds;
+      document.getElementById('pdfAllergies').innerText = p.allergies;
+      document.getElementById('pdfModal').classList.remove('hidden');
+    }
+
+    function closePdfModal() {
+      document.getElementById('pdfModal').classList.add('hidden');
     }
 
     function savePatient(e) {
