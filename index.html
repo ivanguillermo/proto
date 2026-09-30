@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AssetTrack Pro - CRM & Sistema de Ventas</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            royal: { 50: '#f0f7ff', 500: '#0052cc', 600: '#0043a8', 700: '#003380', 900: '#001a40' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-900 text-slate-100 antialiased selection:bg-royal-500 selection:text-white">
+
+  <!-- TOP APP BAR -->
+  <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/60 sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-royal-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-royal-500/30">
+        <i class="fa-solid me-0 fa-crown text-amber-300"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-2">
+          AssetTrack <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30 font-semibold">Pro VIP</span>
+        </h1>
+        <p class="text-xs text-slate-400 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sync Google Sheets Activo
+        </p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleCalcModal()" class="p-2 text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm transition" title="Calculadora Financiera">
+        <i class="fa-solid fa-calculator"></i>
+      </button>
+      <button onclick="simulateSync()" class="p-2 text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm transition" title="Sincronizar Datos">
+        <i id="syncIcon" class="fa-solid fa-arrows-rotate"></i>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold border border-indigo-400">
+        JS
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-6xl mx-auto w-full pb-24">
+    
+    <!-- STATS OVERVIEW CARDS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/50 shadow-sm relative overflow-hidden">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Clientes Activos</div>
+        <div class="text-2xl font-black text-white mt-1" id="statTotalClients">28</div>
+        <div class="text-xs text-emerald-400 mt-1 flex items-center"><i class="fa-solid fa-arrow-up text-[10px] mr-1"></i> +4 este mes</div>
+        <i class="fa-solid fa-users absolute -right-2 -bottom-2 text-5xl text-slate-700/20"></i>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/50 shadow-sm relative overflow-hidden">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Por Cobrar</div>
+        <div class="text-2xl font-black text-amber-400 mt-1" id="statPendingAmount">$14,250</div>
+        <div class="text-xs text-amber-300/80 mt-1">6 cuotas pendientes</div>
+        <i class="fa-solid fa-clock absolute -right-2 -bottom-2 text-5xl text-slate-700/20"></i>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/50 shadow-sm relative overflow-hidden">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Cobrado (Mes)</div>
+        <div class="text-2xl font-black text-emerald-400 mt-1">$8,900</div>
+        <div class="text-xs text-emerald-400/80 mt-1">94% cuotas a tiempo</div>
+        <i class="fa-solid fa-wallet absolute -right-2 -bottom-2 text-5xl text-slate-700/20"></i>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/50 shadow-sm relative overflow-hidden">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Demos Programadas</div>
+        <div class="text-2xl font-black text-indigo-400 mt-1">5</div>
+        <div class="text-xs text-indigo-300/80 mt-1">Próximos 7 días</div>
+        <i class="fa-solid fa-calendar-check absolute -right-2 -bottom-2 text-5xl text-slate-700/20"></i>
+      </div>
+    </section>
+
+    <!-- ACTION BUTTONS & SEARCH -->
+    <section class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <!-- Search & Filters -->
+      <div class="relative w-full sm:w-80">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="searchInput" onkeyup="filterClients()" placeholder="Buscar por cliente, teléfono o ciudad..." class="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-royal-500 text-slate-100 placeholder-slate-500">
+      </div>
+
+      <!-- Filter Pills & Add Client -->
+      <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+        <select id="statusFilter" onchange="filterClients()" class="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-royal-500">
+          <option value="ALL">Todos los Estados</option>
+          <option value="Al Día">Al Día</option>
+          <option value="Cobro Pendiente">Cobro Pendiente</option>
+          <option value="Demo Programada">Demo Programada</option>
+        </select>
+
+        <button onclick="openClientModal()" class="whitespace-nowrap bg-gradient-to-r from-royal-600 to-indigo-600 hover:from-royal-500 hover:to-indigo-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-royal-600/30 flex items-center gap-2 transition active:scale-95">
+          <i class="fa-solid fa-user-plus"></i> Nuevo Cliente
+        </button>
+      </div>
+    </section>
+
+    <!-- CLIENT CARDS / TABLE GRID -->
+    <section class="space-y-3" id="clientsList">
+      <!-- Rendered dynamically -->
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVBAR (PWA MOBILE STYLE) -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-lg border-t border-slate-700/80 px-6 py-2 z-30 flex justify-around items-center max-w-md mx-auto rounded-t-2xl md:max-w-xl">
+    <button onclick="switchTab('clients')" class="flex flex-col items-center gap-1 text-royal-500 font-semibold text-[11px]">
+      <i class="fa-solid fa-address-book text-lg"></i>
+      <span>Clientes</span>
+    </button>
+    <button onclick="toggleCalcModal()" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 text-[11px] transition">
+      <i class="fa-solid fa-calculator text-lg"></i>
+      <span>Calculadora</span>
+    </button>
+    <button onclick="openNoticeModal()" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 text-[11px] transition relative">
+      <i class="fa-solid fa-bell text-lg"></i>
+      <span class="absolute top-0 right-2 w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+      <span>Alertas</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: ADD / EDIT CLIENT -->
+  <div id="clientModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-check text-royal-500"></i> Registrar / Editar Cliente
+        </h3>
+        <button onclick="closeClientModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="clientForm" onsubmit="saveClient(event)" class="space-y-4 mt-4">
+        <input type="hidden" id="clientId">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Completo</label>
+          <input type="text" id="clientName" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono (WhatsApp)</label>
+            <input type="tel" id="clientPhone" required placeholder="+1 305 555 0192" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Estado / Categoría</label>
+            <select id="clientStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+              <option value="Al Día">Al Día</option>
+              <option value="Cobro Pendiente">Cobro Pendiente</option>
+              <option value="Demo Programada">Demo Programada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Producto Adquirido / Interés</label>
+            <input type="text" id="clientProduct" placeholder="Ej: Set de Cocina 9 Pzs" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Monto de Cuota Mensual ($)</label>
+            <input type="number" id="clientPayment" placeholder="250" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Dirección / Ciudad</label>
+          <input type="text" id="clientAddress" placeholder="Miami, FL" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Día de Pago Mensual</label>
+          <input type="number" id="clientPayDay" min="1" max="31" placeholder="Ej: 15" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-royal-500">
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeClientModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-royal-600 hover:bg-royal-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-royal-600/30">Guardar en Google Sheets</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: INVOICE GENERATOR / PDF PREVIEW -->
+  <div id="invoiceModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 w-full max-w-xl rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-invoice text-royal-600 text-xl"></i>
+          <h3 class="text-lg font-bold text-slate-900">Vista Previa de Factura / Recibo</h3>
+        </div>
+        <button onclick="closeInvoiceModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- INVOICE TEMPLATE MOCKUP -->
+      <div id="invoicePrintArea" class="p-6 bg-slate-50 border border-slate-200 rounded-xl my-4 space-y-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-xl font-black text-royal-700 tracking-tight">ROYAL PRESTIGE REPRESENTATIVE</h2>
+            <p class="text-xs text-slate-500">Distribuidor Independiente Autorizado</p>
+            <p class="text-xs text-slate-500">EE. UU. - Asesoría Directa</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-bold bg-slate-200 text-slate-700 px-2.5 py-1 rounded">RECIBO #RP-8492</span>
+            <p class="text-[11px] text-slate-500 mt-1">Fecha: <span id="invDate">2026-09-30</span></p>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <p class="font-bold text-slate-400 uppercase">Cliente:</p>
+            <p class="font-bold text-slate-800 text-sm" id="invClientName">Carlos Mendoza</p>
+            <p class="text-slate-600" id="invClientPhone">+1 (305) 882-9102</p>
+            <p class="text-slate-600" id="invClientAddress">Orlando, FL</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-slate-400 uppercase">Estado del Pago:</p>
+            <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-[11px]">RECIBIDO / CONFIRMADO</span>
+          </div>
+        </div>
+
+        <table class="w-full text-xs text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-200 text-slate-700">
+              <th class="p-2 rounded-l">Descripción / Sistema</th>
+              <th class="p-2 text-right">Cuota</th>
+              <th class="p-2 text-right rounded-r">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-slate-200">
+              <td class="p-2 font-medium" id="invProductName">Set Novawave 7 Piezas</td>
+              <td class="p-2 text-right">Cuota 04 / 12</td>
+              <td class="p-2 text-right font-bold" id="invAmount">$280.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="flex justify-between items-center pt-2">
+          <p class="text-[10px] text-slate-400 italic">Factura generada automáticamente vía Google Apps Script & Slides API.</p>
+          <div class="text-right">
+            <p class="text-xs text-slate-500">Total Recibido</p>
+            <p class="text-xl font-black text-slate-900" id="invTotal">$280.00 USD</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <button onclick="simulateSendEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Enviar por Email al Cliente
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Descargar / Imprimir PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CALCULADORA FINANCIERA ROYAL PRESTIGE -->
+  <div id="calcModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-amber-400"></i> Calculadora de Cuotas y Enganche
+        </h3>
+        <button onclick="toggleCalcModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 mt-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Precio Total del Equipo ($)</label>
+          <input type="number" id="calcPrice" value="2400" oninput="calculateFinancing()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">% Enganche / Initial</label>
+            <input type="number" id="calcDownPct" value="15" oninput="calculateFinancing()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Plazo (Meses)</label>
+            <select id="calcMonths" onchange="calculateFinancing()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
+              <option value="6">6 Meses</option>
+              <option value="12" selected>12 Meses</option>
+              <option value="18">18 Meses</option>
+              <option value="24">24 Meses</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-700/80 space-y-2 mt-4">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Enganche Requerido:</span>
+            <span class="font-bold text-amber-400" id="calcDownAmount">$360.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Monto Financiar:</span>
+            <span class="font-bold text-slate-200" id="calcFinanced">$2,040.00</span>
+          </div>
+          <div class="flex justify-between text-sm pt-2 border-t border-slate-800">
+            <span class="font-semibold text-white">Cuota Mensual Estimada:</span>
+            <span class="font-black text-emerald-400 text-base" id="calcMonthly">$187.00 / mes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // MOCK CLIENTS DATA (SIMULANDO BASE DE DATOS EN GOOGLE SHEETS)
+    let clients = [
+      { id: '1', name: 'Carlos Mendoza', phone: '+13058829102', status: 'Cobro Pendiente', product: 'Set Novawave 7 Pzs', payment: 280, payDay: 5, address: 'Miami, FL' },
+      { id: '2', name: 'Dra. Elena Rostova', phone: '+14079912034', status: 'Al Día', product: 'Filtro de Agua Deluxe', payment: 140, payDay: 15, address: 'Orlando, FL' },
+      { id: '3', name: 'Roberto Gómez', phone: '+18134401928', status: 'Demo Programada', product: 'Sartén de 14 Pulgadas', payment: 190, payDay: 20, address: 'Tampa, FL' },
+      { id: '4', name: 'María V. Rodríguez', phone: '+17865519023', status: 'Al Día', product: 'Extractor de Jugos Royal', payment: 210, payDay: 10, address: 'Hialeah, FL' }
+    ];
+
+    function renderClients(dataToRender = clients) {
+      const container = document.getElementById('clientsList');
+      container.innerHTML = '';
+
+      dataToRender.forEach(c => {
+        let statusBadge = '';
+        if (c.status === 'Al Día') {
+          statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i>Al Día</span>`;
+        } else if (c.status === 'Cobro Pendiente') {
+          statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Pagar el día ${c.payDay}</span>`;
+        } else {
+          statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"><i class="fa-solid fa-calendar mr-1"></i>Demo Pendiente</span>`;
+        }
+
+        const msgWA = encodeURIComponent(`Hola ${c.name}, espero estés excelente. Te saluda tu asesor de Royal Prestige para recordarte la cuota de $${c.payment} correspondiente a este mes. ¡Quedo atento!`);
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-800/90 border border-slate-700/70 hover:border-royal-500/50 rounded-2xl p-4 transition-all shadow-md space-y-3';
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-royal-400 border border-slate-600">
+                ${c.name.split(' ').map(n=>n[0]).join('')}
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white flex items-center gap-2">${c.name}</h4>
+                <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${c.address}</p>
+              </div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 bg-slate-900/60 p-2.5 rounded-xl text-xs border border-slate-800">
+            <div>
+              <span class="text-slate-500 block">Equipo/Producto:</span>
+              <span class="font-medium text-slate-200">${c.product}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-slate-500 block">Cuota Mensual:</span>
+              <span class="font-bold text-emerald-400 text-sm">$${c.payment} USD</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1 text-xs gap-2">
+            <!-- WhatsApp button -->
+            <a href="https://wa.me/${c.phone.replace(/[^0-9]/g,'')}?text=${msgWA}" target="_blank" class="flex-1 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-semibold rounded-xl text-center border border-emerald-500/30 transition flex items-center justify-center gap-1.5">
+              <i class="fa-brands fa-whatsapp text-sm"></i> Notificar WA
+            </a>
+
+            <!-- Generate Invoice PDF -->
+            <button onclick="openInvoiceModal('${c.id}')" class="flex-1 py-2 bg-royal-600/20 hover:bg-royal-600/30 text-royal-300 font-semibold rounded-xl text-center border border-royal-500/30 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-file-pdf text-sm"></i> Factura PDF
+            </button>
+
+            <!-- Edit Client -->
+            <button onclick="editClient('${c.id}')" class="p-2 bg-slate-700/60 text-slate-300 hover:text-white rounded-xl">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterClients() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const st = document.getElementById('statusFilter').value;
+
+      const filtered = clients.filter(c => {
+        const matchesQ = c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.address.toLowerCase().includes(q);
+        const matchesSt = st === 'ALL' || c.status === st;
+        return matchesQ && matchesSt;
+      });
+
+      renderClients(filtered);
+    }
+
+    function openClientModal() {
+      document.getElementById('clientForm').reset();
+      document.getElementById('clientId').value = '';
+      document.getElementById('clientModal').classList.remove('hidden');
+    }
+
+    function closeClientModal() {
+      document.getElementById('clientModal').classList.add('hidden');
+    }
+
+    function saveClient(e) {
+      e.preventDefault();
+      const id = document.getElementById('clientId').value || Date.now().toString();
+      const newClient = {
+        id,
+        name: document.getElementById('clientName').value,
+        phone: document.getElementById('clientPhone').value,
+        status: document.getElementById('clientStatus').value,
+        product: document.getElementById('clientProduct').value || 'Set Royal Standard',
+        payment: parseFloat(document.getElementById('clientPayment').value || 200),
+        payDay: parseInt(document.getElementById('clientPayDay').value || 15),
+        address: document.getElementById('clientAddress').value || 'EE. UU.'
+      };
+
+      const idx = clients.findIndex(c => c.id === id);
+      if (idx >= 0) clients[idx] = newClient;
+      else clients.unshift(newClient);
+
+      renderClients();
+      closeClientModal();
+      simulateSync();
+    }
+
+    function editClient(id) {
+      const c = clients.find(x => x.id === id);
+      if (!c) return;
+      document.getElementById('clientId').value = c.id;
+      document.getElementById('clientName').value = c.name;
+      document.getElementById('clientPhone').value = c.phone;
+      document.getElementById('clientStatus').value = c.status;
+      document.getElementById('clientProduct').value = c.product;
+      document.getElementById('clientPayment').value = c.payment;
+      document.getElementById('clientPayDay').value = c.payDay;
+      document.getElementById('clientAddress').value = c.address;
+
+      document.getElementById('clientModal').classList.remove('hidden');
+    }
+
+    function openInvoiceModal(id) {
+      const c = clients.find(x => x.id === id) || clients[0];
+      document.getElementById('invClientName').innerText = c.name;
+      document.getElementById('invClientPhone').innerText = c.phone;
+      document.getElementById('invClientAddress').innerText = c.address;
+      document.getElementById('invProductName').innerText = c.product;
+      document.getElementById('invAmount').innerText = `$${c.payment}.00`;
+      document.getElementById('invTotal').innerText = `$${c.payment}.00 USD`;
+      document.getElementById('invoiceModal').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.add('hidden');
+    }
+
+    function toggleCalcModal() {
+      const m = document.getElementById('calcModal');
+      m.classList.contains('hidden') ? m.classList.remove('hidden') : m.classList.add('hidden');
+    }
+
+    function calculateFinancing() {
+      const price = parseFloat(document.getElementById('calcPrice').value || 0);
+      const pct = parseFloat(document.getElementById('calcDownPct').value || 0);
+      const months = parseInt(document.getElementById('calcMonths').value || 12);
+
+      const down = price * (pct / 100);
+      const financed = price - down;
+      const monthly = financed / months;
+
+      document.getElementById('calcDownAmount').innerText = `$${down.toFixed(2)}`;
+      document.getElementById('calcFinanced').innerText = `$${financed.toFixed(2)}`;
+      document.getElementById('calcMonthly').innerText = `$${monthly.toFixed(2)} / mes`;
+    }
+
+    function simulateSync() {
+      const icon = document.getElementById('syncIcon');
+      icon.classList.add('fa-spin');
+      setTimeout(() => {
+        icon.classList.remove('fa-spin');
+      }, 1000);
+    }
+
+    function simulateSendEmail() {
+      alert("¡Simulación! La orden fue enviada vía Google Apps Script (MailApp API) al correo del cliente con el PDF adjunto generado desde plantilla de Google Slides.");
+      closeInvoiceModal();
+    }
+
+    function openNoticeModal() {
+      alert("Recordatorio PWA: Hay 2 clientes con cuotas por vencer en los próximos 3 días.");
+    }
+
+    // INIT
+    renderClients();
+    calculateFinancing();
+  </script>
+</body>
+</html>
